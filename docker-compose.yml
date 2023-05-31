@@ -3,10 +3,10 @@ version: '3'
 services:
 
 ### Database Container ######################################
-  mysql_osticket:
-    container_name: mysql_osticket
-    hostname: mysql_osticket.local
-    image: mysql
+  mariadb_osticket:
+    container_name: mariadb_osticket
+    hostname: mariadb_osticket.local
+    image: mariadb
     environment:
       - MYSQL_DATABASE=osticket
       - MYSQL_USER=osticket
@@ -17,7 +17,7 @@ services:
       - ./volumes/mysql:/var/lib/mysql
       - ./osticketdb.sql.gz:/docker-entrypoint-initdb.d/backup.sql.gz:ro
     networks:
-      - default
+      - osticket_mariadb
 
 ### Applications Code Container #############################
   app_osticket:
@@ -25,27 +25,41 @@ services:
     build:
       context: .
     depends_on:
-      - mysql_osticket
+      - mariadb_osticket
     expose:
       - 80
     environment:
       - VIRTUAL_HOST=${DOMAIN}
-      - LETSENCRYPT_HOST=${DOMAIN}
       - APPHOST=http://localhost:80
       - APPHTTPS=false
     volumes:
       - ./volumes/attachments:/var/www/html/attachments:rw
       - ./volumes/plugins:/var/www/html/include/plugins:rw
       - ./volumes/ost-config.php:/var/www/html/include/ost-config.php:rw
+    labels:
+      #- traefik.enable=true
+      - "traefik.http.routers.osticket.entrypoints=websecure"
+      - "traefik.http.routers.osticket.rule=Host(`${DOMAIN}`)"
+      - "traefik.http.routers.osticket.tls=true"
+      - "traefik.http.routers.osticket.tls.certresolver=leresolver"
+      - "traefik.http.routers.osticket.tls.domains[0].main=${DOMAIN}"
+      - "traefik.http.routers.unifi.service=osticket"
+      - "traefik.docker.network=traefik_traefik_proxy_osticket"
+      - "traefik.http.services.unifi.loadbalancer.server.port=443"
+      - "traefik.http.services.unifi.loadbalancer.server.scheme=https"
     networks:
-      - nginx-proxy
-      - default
+       - traefik_traefik_proxy_osticket
+       - osticket_mariadb
+ #     - nginx-proxy
+ #     - default
 
 ### Networks Setup ############################################
 
 networks:
-  default:
-    driver: "bridge"
-  nginx-proxy:
-    external:
-      name: nginx-proxy
+  traefik_traefik_proxy_osticket:
+    external: true
+  osticket_mariadb:
+    external: false
+#  nginx-proxy:
+#    external:
+#      name: nginx-proxy
