@@ -1,4 +1,4 @@
-FROM php:7.3-apache
+FROM php:8.1-apache
 MAINTAINER Vincent Hindriksen
 
 ENV APPHOST http://localhost:80
