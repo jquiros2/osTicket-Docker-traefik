@@ -1,4 +1,4 @@
-FROM php:8.1-apache
+FROM 8.1.20RC1-apache-bullseye
 MAINTAINER Vincent Hindriksen
 
 ENV APPHOST http://localhost:80
