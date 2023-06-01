@@ -10,8 +10,8 @@ services:
     environment:
       - MYSQL_DATABASE=osticket
       - MYSQL_USER=osticket
-      - MYSQL_PASSWORD=osticket
-      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_PASSWORD=ostickepass
+      - MYSQL_ROOT_PASSWORD=rootpass
     command: ["mysqld", "--default-authentication-plugin=mysql_native_password"]
     volumes:
       - ./volumes/mysql:/var/lib/mysql
@@ -35,18 +35,18 @@ services:
     volumes:
       - ./volumes/attachments:/var/www/html/attachments:rw
       - ./volumes/plugins:/var/www/html/include/plugins:rw
-      - ./volumes/ost-config.php:/var/www/html/include/ost-config.php:rw
+      - ./ost-config.php:/var/www/html/include/ost-config.php:rw
     labels:
-      #- traefik.enable=true
-      - "traefik.http.routers.osticket.entrypoints=websecure"
+#      - traefik.enable=true
       - "traefik.http.routers.osticket.rule=Host(`${DOMAIN}`)"
-      - "traefik.http.routers.osticket.tls=true"
+      - "traefik.http.routers.osticket.entrypoints=websecure"
+#      - "traefik.http.routers.osticket.tls=true"
       - "traefik.http.routers.osticket.tls.certresolver=leresolver"
-      - "traefik.http.routers.osticket.tls.domains[0].main=${DOMAIN}"
-      - "traefik.http.routers.unifi.service=osticket"
+#      - "traefik.http.routers.osticket.tls.domains[0].main=${DOMAIN}"
+#      - "traefik.http.routers.osticket.service=osticket"
       - "traefik.docker.network=traefik_traefik_proxy_osticket"
-      - "traefik.http.services.unifi.loadbalancer.server.port=443"
-      - "traefik.http.services.unifi.loadbalancer.server.scheme=https"
+#      - "traefik.http.services.osticket.loadbalancer.server.port=443"
+#      - "traefik.http.services.osticket.loadbalancer.server.scheme=https"
     networks:
        - traefik_traefik_proxy_osticket
        - osticket_mariadb
