@@ -39,7 +39,7 @@ define('ADMIN_EMAIL','root@support.test.com');
 # ---------------------------------------------------
 # Mysql Login info
 define('DBTYPE','mysql');
-define('DBHOST','mysql_osticket.local');
+define('DBHOST','mariadb_osticket.local');
 define('DBNAME','osticket');
 define('DBUSER','osticket');
 define('DBPASS','osticket');
