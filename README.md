@@ -1,5 +1,5 @@
 #this is a fork of https://github.com/VincentSC/osTicket-Docker trying to adapt it to traefik and php8.1 among other things.
-It is nworking.
+It is working.
 --------------------------------------------------------------------------
 This is the docker version to *migrate* your osTicket to Docker.
 
