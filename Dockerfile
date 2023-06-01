@@ -1,4 +1,4 @@
-FROM php:8.1.20RC1-apache-bullseye
+FROM php:8.0-apache
 MAINTAINER Vincent Hindriksen
 
 ENV APPHOST http://localhost:80
@@ -25,8 +25,9 @@ RUN apt-get install -y \
         libfreetype6-dev \
         libjpeg62-turbo-dev \
         libpng-dev \
-    && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
-    && docker-php-ext-install gd
+        libonig-dev
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg
+RUN docker-php-ext-install gd
 
 # Install APCu
 RUN pecl install apcu \
@@ -38,7 +39,8 @@ RUN ls -l "$PHP_INI_DIR/"
 #RUN ls -l /usr/src/php/ext/
 
 # Install the PHP mcrypt extention
-RUN pecl install mcrypt-1.0.4 \
+#RUN pecl install mcrypt-1.0.4 \
+RUN pecl install mcrypt-1.0.5 \
    && echo "extension=mcrypt.so" > "$PHP_INI_DIR/php.ini"
 # RUN docker-php-ext-install mcrypt
 # Install mbstring
@@ -61,7 +63,7 @@ RUN docker-php-ext-configure imap --with-kerberos --with-imap-ssl \
 # Install Intl
 RUN docker-php-ext-install intl
 # Install Zend OPcache
-RUN docker-php-ext-install opcache 
+RUN docker-php-ext-install opcache
 
 # Cleaning up
 RUN pecl clear-cache
@@ -93,6 +95,7 @@ RUN groupmod --non-unique --gid 1000 www-data
 
 VOLUME ["/var/www/html/storage", "/var/www/html/custom"]
 
-CMD /var/www/html/init_storage.sh; cron; apache2-foreground
+#CMD /var/www/html/init_storage.sh; cron; apache2-foreground
+CMD cron; apache2-foreground
 
 EXPOSE 80
